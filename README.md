@@ -1,7 +1,7 @@
-HLDemo
+HLSDemo
 ==========
 
-This is a library for reading and writing GoldSource demo files.
+This is a library for reading and writing Half-Life: Source old old engine demo files.
 
 #Building
 ####Windows
