@@ -9,20 +9,16 @@
 #include "DemoFrame.hpp"
 
 struct DemoHeader {
-	int32_t netProtocol;
 	int32_t demoProtocol;
+	int32_t netProtocol;
 	std::string mapName;
 	std::string gameDir;
-	int32_t mapCRC;
 	int32_t directoryOffset;
 };
 
 struct DemoDirectoryEntry {
 	int32_t type;
-	std::string description;
-	int32_t flags;
-	int32_t CDTrack;
-	float trackTime;
+	float playbackTime;
 	int32_t frameCount;
 	int32_t offset;
 	int32_t fileLength;
