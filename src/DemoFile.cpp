@@ -30,6 +30,7 @@ enum {
 	FRAME_USERCMD_SIZE = 10,
 	FRAME_USERCMD_DATA_MAX_SIZE = 1024,
 	FRAME_STRINGTABLES_SIZE = 4,
+	FRAME_NETWORK_DATA_TABLE_SIZE = 4,
 	FRAME_NETMSG_SIZE = 108,
 	FRAME_NETMSG_MIN_MESSAGE_LENGTH = 0,
 	FRAME_NETMSG_MAX_MESSAGE_LENGTH = 80032
@@ -383,6 +384,35 @@ void DemoFile::ReadFramesInternal(std::ifstream& demo, size_t demoSize)
 			}
 				break;
 
+			case DemoFrameType::NETWORK_DATA_TABLE:
+			{
+				if (demoSize - demo.tellg() < FRAME_NETWORK_DATA_TABLE_SIZE) {
+					// Unexpected EOF.
+					stop = true;
+					break;
+				}
+
+				NetworkDataTableFrame f;
+				f.type = frame.type;
+				f.time = frame.time;
+				f.frame = frame.frame;
+
+				int32_t length;
+				read_object(demo, length);
+
+				if (length < 0 || demoSize - demo.tellg() < static_cast<size_t>(length)) {
+					// Unexpected EOF.
+					stop = true;
+					break;
+				}
+
+				f.data.resize(length);
+				read_objects(demo, f.data);
+
+				entry.frames.emplace_back(new NetworkDataTableFrame(std::move(f)));
+			}
+				break;
+
 			case DemoFrameType::NEXT_SECTION:
 			{
 				entry.frames.emplace_back(new DemoFrame(std::move(frame)));
@@ -548,6 +578,15 @@ void DemoFile::SaveInternal(std::ofstream o) const
 			case DemoFrameType::STRINGTABLES:
 			{
 				auto f = reinterpret_cast<StringTablesFrame*>(frame.get());
+
+				write_object(o, static_cast<int32_t>(f->data.size()));
+				write_objects(o, f->data);
+			}
+				break;
+
+			case DemoFrameType::NETWORK_DATA_TABLE:
+			{
+				auto f = reinterpret_cast<NetworkDataTableFrame*>(frame.get());
 
 				write_object(o, static_cast<int32_t>(f->data.size()));
 				write_objects(o, f->data);

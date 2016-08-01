@@ -4,12 +4,14 @@
 #include <vector>
 
 enum class DemoFrameType : uint8_t {
+	STARTUP_PACKET = 1,
 	NETWORK_PACKET = 2,
 	JUMPTIME = 3,
 	CONSOLE_COMMAND = 4,
 	USERCMD = 5,
 	STRINGTABLES = 6,
-	NEXT_SECTION = 7
+	NETWORK_DATA_TABLE = 7,
+	NEXT_SECTION = 8
 };
 
 struct DemoFrame {
@@ -25,6 +27,10 @@ struct ConsoleCommandFrame : DemoFrame {
 };
 
 struct StringTablesFrame : DemoFrame {
+	std::vector<unsigned char> data;
+};
+
+struct NetworkDataTableFrame : DemoFrame {
 	std::vector<unsigned char> data;
 };
 
